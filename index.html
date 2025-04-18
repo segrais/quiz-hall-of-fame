@@ -122,7 +122,7 @@
 
   const TOTAL_QUESTIONS = 2;
   const SHEET_JSON_URL = "https://opensheet.elk.sh/18R-0c0Szq_A4JFqzHuCIOUT9X_wk4M4pOqFtiqV3axw/Formulaire%20sans%20titre%20%28R%C3%A9ponses%29";
-  const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSc27TtPdiPO4WEMoWAD9cCTMD1EX6RBgmTxLdPL6WEM-r4Kog/viewform";
+  const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfXvSt5fDbUNXf1hCMeDq9k5fKNFoZRx9eqok4kfj-SNcI6lw/viewform";
 
   function setArrowDirection(cap) {
     const angle = angleMap[cap];
@@ -174,7 +174,7 @@
     if (correctCount === TOTAL_QUESTIONS) {
       const name = prompt(`Bravo ! Tu accèdes au Hall of Fame. Temps : ${totalTime} secondes. Entre ton nom:`);
       const date = new Date().toLocaleDateString();
-      const prefilledForm = `${FORM_URL}?usp=pp_url&entry.1494863939=${encodeURIComponent(name)}&entry.1248464020=${totalTime}&entry.1673185390=${date}`;
+      const prefilledForm = `${FORM_URL}?usp=pp_url&entry.2142280584=${encodeURIComponent(name)}&entry.984016441=${totalTime}&entry.1028892536=${date}`;
       window.open(prefilledForm, '_blank');
     } else {
       resultDiv.textContent = `❌ Tu as fait ${TOTAL_QUESTIONS - correctCount} erreur(s). Il faut ${TOTAL_QUESTIONS}/10 pour accéder au Hall of Fame.`;
