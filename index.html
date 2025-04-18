@@ -185,6 +185,11 @@
   function renderHallOfFame(data) {
     if (!hallTable) return;
     hallTable.innerHTML = '';
+    if (!Array.isArray(data)) {
+      console.warn("Les données reçues ne sont pas un tableau :", data);
+      resultDiv.textContent = "⚠️ Aucune donnée valide dans le Hall of Fame.";
+      return;
+    }
     data.sort((a, b) => parseFloat(a["Temps (secondes)"]) - parseFloat(b["Temps (secondes)"]));
     data.slice(0, 50).forEach((rec, index) => {
       const tr = document.createElement('tr');
