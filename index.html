@@ -121,7 +121,8 @@
   let startTime;
 
   const TOTAL_QUESTIONS = 2;
-  const HALL_OF_FAME_URL = "https://raw.githubusercontent.com/segrais/quiz-hall-of-fame/main/hall-of-fame.json";
+  const SHEET_JSON_URL = "https://opensheet.elk.sh/1gGHDwVZXOD63shA707QRF3z25fvyPsDmN0I7xazu2x4/Formulaire+réponses+1";
+  const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSc27TtPdiPO4WEMoWAD9cCTMD1EX6RBgmTxLdPL6WEM-r4Kog/viewform"; // Remplacer par l’URL complète de ton formulaire
 
   function setArrowDirection(cap) {
     const angle = angleMap[cap];
@@ -172,8 +173,9 @@
     document.getElementById('startBtn').disabled = false;
     if (correctCount === TOTAL_QUESTIONS) {
       const name = prompt(`Bravo ! Tu accèdes au Hall of Fame. Temps : ${totalTime} secondes. Entre ton nom:`);
-      const entry = { name, time: parseFloat(totalTime), date: new Date().toLocaleDateString() };
-      alert("💾 Copie cette ligne dans hall-of-fame.json :\n" + JSON.stringify(entry) + ",");
+      const date = new Date().toLocaleDateString();
+      const prefilledForm = `${FORM_URL}?usp=pp_url&entry.1494863939=${encodeURIComponent(name)}&entry.1248464020=${totalTime}&entry.1673185390=${date}`;
+      window.open(prefilledForm, '_blank');
     } else {
       resultDiv.textContent = `❌ Tu as fait ${TOTAL_QUESTIONS - correctCount} erreur(s). Il faut ${TOTAL_QUESTIONS}/10 pour accéder au Hall of Fame.`;
       resultDiv.style.color = 'red';
@@ -183,16 +185,16 @@
   function renderHallOfFame(data) {
     if (!hallTable) return;
     hallTable.innerHTML = '';
-    data.sort((a, b) => a.time - b.time);
+    data.sort((a, b) => parseFloat(a["Temps (secondes)"]) - parseFloat(b["Temps (secondes)"]));
     data.slice(0, 50).forEach((rec, index) => {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${index + 1}</td><td>${rec.name}</td><td>${rec.time}s</td><td>${rec.date}</td>`;
+      tr.innerHTML = `<td>${index + 1}</td><td>${rec["Nom"]}</td><td>${rec["Temps (secondes)"]}s</td><td>${rec["Date"]}</td>`;
       hallTable.appendChild(tr);
     });
   }
 
   function loadHallOfFame() {
-    fetch(HALL_OF_FAME_URL)
+    fetch(SHEET_JSON_URL)
       .then(res => res.json())
       .then(data => renderHallOfFame(data))
       .catch(err => console.error("❌ Erreur de chargement du Hall of Fame:", err));
