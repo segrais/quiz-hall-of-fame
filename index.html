@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Cap en Degrés</title>
+  <style>/* ...styles inchangés... */</style>
+</head>
+<body>
+<!-- ...contenu HTML inchangé... -->
+<script>
+  const caps = ["030°", "045°", "060°", "090°", "120°", "135°", "150°", "180°", "210°", "225°", "240°", "270°", "300°", "315°", "330°", "360°"];
+  const angleMap = {"030°": 30, "045°": 45, "060°": 60, "090°": 90, "120°": 120, "135°": 135, "150°": 150, "180°": 180, "210°": 210, "225°": 225, "240°": 240, "270°": 270, "300°": 300, "315°": 315, "330°": 330, "360°": 0};
+  const arrow = document.getElementById('arrow');
+  const answersDiv = document.getElementById('answers');
+  const resultDiv = document.getElementById('result');
+  const hallTable = document.querySelector('#hallTable tbody');
+
+  let correctCap = "";
+  let questionIndex = 0;
+  let correctCount = 0;
+  let startTime;
+
+  const TOTAL_QUESTIONS = 2;
+  const HALL_OF_FAME_URL = "https://raw.githubusercontent.com/segrais/quiz-hall-of-fame/main/hall-of-fame.json";
+
+  function setArrowDirection(cap) {
+    const angle = angleMap[cap];
+    arrow.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+  }
+
+  function startQuiz() {
+    questionIndex = 0;
+    correctCount = 0;
+    resultDiv.textContent = '';
+    document.getElementById('startBtn').disabled = true;
+    startTime = Date.now();
+    nextQuestion();
+  }
+
+  function nextQuestion() {
+    if (questionIndex === TOTAL_QUESTIONS) return endQuiz();
+    correctCap = caps[Math.floor(Math.random() * caps.length)];
+    setArrowDirection(correctCap);
+    const options = [correctCap];
+    while (options.length < 4) {
+      const rand = caps[Math.floor(Math.random() * caps.length)];
+      if (!options.includes(rand)) options.push(rand);
+    }
+    shuffleArray(options);
+    answersDiv.innerHTML = '';
+    resultDiv.textContent = '';
+    options.forEach(option => {
+      const btn = document.createElement('button');
+      btn.textContent = option;
+      btn.onclick = () => handleAnswer(option);
+      answersDiv.appendChild(btn);
+    });
+  }
+
+  function handleAnswer(selected) {
+    const isCorrect = selected === correctCap;
+    resultDiv.textContent = isCorrect ? '✅ Bonne réponse !' : `❌ Mauvaise réponse. C'était ${correctCap}`;
+    resultDiv.style.color = isCorrect ? 'green' : 'red';
+    if (isCorrect) correctCount++;
+    questionIndex++;
+    setTimeout(nextQuestion, 1000);
+  }
+
+  function endQuiz() {
+    const totalTime = ((Date.now() - startTime) / 1000).toFixed(2);
+    answersDiv.innerHTML = '';
+    document.getElementById('startBtn').disabled = false;
+    if (correctCount === TOTAL_QUESTIONS) {
+      const name = prompt(`Bravo ! Tu accèdes au Hall of Fame. Temps : ${totalTime} secondes. Entre ton nom:`);
+      const entry = { name, time: parseFloat(totalTime), date: new Date().toLocaleDateString() };
+      alert("💾 Copie cette ligne dans hall-of-fame.json :\n" + JSON.stringify(entry) + ",");
+    } else {
+      resultDiv.textContent = `❌ Tu as fait ${TOTAL_QUESTIONS - correctCount} erreur(s). Il faut ${TOTAL_QUESTIONS}/10 pour accéder au Hall of Fame.`;
+      resultDiv.style.color = 'red';
+    }
+  }
+
+  function renderHallOfFame(data) {
+    hallTable.innerHTML = '';
+    data.sort((a, b) => a.time - b.time);
+    data.slice(0, 50).forEach((rec, index) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${index + 1}</td><td>${rec.name}</td><td>${rec.time}s</td><td>${rec.date}</td>`;
+      hallTable.appendChild(tr);
+    });
+  }
+
+  function loadHallOfFame() {
+    fetch(HALL_OF_FAME_URL)
+      .then(res => res.json())
+      .then(data => renderHallOfFame(data))
+      .catch(err => console.error("❌ Erreur de chargement du Hall of Fame:", err));
+  }
+
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+
+  loadHallOfFame();
+</script>
+</body>
+</html>
